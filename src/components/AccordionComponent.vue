@@ -4,8 +4,8 @@
       <img class="iconWrapper" :src="chevronIconUrl" alt=""/>
       <div class="title">{{ title }}</div>
     </div>
-    <div v-show="showSlot">
-      <slot />
+    <div class="slot" v-show="showSlot" @click.stop>
+      <slot/>
     </div>
   </div>
 </template>
@@ -31,6 +31,7 @@ export default {
 <style scoped>
 .accordion {
   margin-top: 10px;
+  height: 105px;
 }
 
 .titleWrapper {
@@ -46,5 +47,9 @@ export default {
 .iconWrapper {
   margin-left: -16px;
   width: 12px;
+}
+
+.slot {
+  margin-top: 10px;
 }
 </style>

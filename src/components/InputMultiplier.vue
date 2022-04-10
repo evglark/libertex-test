@@ -1,28 +1,36 @@
 <template>
-  <div class="multiplierInputWrapper">
-    <InputNumberRange :range="range" v-model:value="value" :icon="true"/>
-    <div class="output"> = $ {{ getOutput }}</div>
+  <div class="multiplierInputWrapper" v-click-outside="onHideRange" @click.stop="onShowRange">
+    <img class="iconWrapper" :src="crossIconUrl" alt=""/>
+    <input class="multiplier" :class="{ multiplierActive: showRange }" type="text" :value="value" :readonly="true">
+    <div class="slot">
+      <slot/>
+    </div>
+    <div class="popupWrapper" v-show="showRange">
+      <div class="popupTriangle"/>
+      <div class="rangeWrapper">
+        <input type="range" :min="min" :max="max" step="1"
+               class="slider" :style="{ 'background-size': getValuePercentByRange+'% 100%' }"
+               :value="value" @input="$emit('update:value', +$event.target.value)"/>
+        <div class="rangeValues">
+          <span class="minValue">{{ min }}</span>
+          <span class="currentValue" :style="{ left: getValuePercentByRange+'%' }">{{ value }}</span>
+          <span class="maxValue">{{ max }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import InputNumberRange from '@/components/InputNumberRange';
-
 export default {
-  name: 'MultiplierInput',
-  components: {
-    InputNumberRange,
-  },
-  props: {
-    range: String,
-    value: Number,
-    output: Number
-  },
+  name: 'InputMultiplier',
+  props: { range: String, value: Number },
   data() {
     const inputRange = this.range.split('-')
     return ({
       showRange: false,
-      min: inputRange[0], max: inputRange[1],
+      min: inputRange[0],
+      max: inputRange[1],
       crossIconUrl: require('/src/assets/cross.svg'),
     })
   },
@@ -35,11 +43,6 @@ export default {
     }
   },
   computed: {
-    getOutput() {
-      return this.output
-          .toString()
-          .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ")
-    },
     getValuePercentByRange() {
       return (this.value - this.min) * 100 / (this.max - this.min)
     }
@@ -49,42 +52,41 @@ export default {
 
 <style scoped>
 .multiplierInputWrapper {
+  width: 125px;
   position: relative;
   display: flex;
 }
 
 .iconWrapper {
   position: absolute;
-  top: 25%; left: 2px;
+  top: 18%; left: 2px;
   width: 14px;
 }
 
 .multiplier {
-  width: 10%;
+  width: 24px;
   padding: 0 4px 0 12px;
   text-align: right;
   border-radius: 4px;
+  margin: 1px;
   border: 1px solid rgb(192, 194, 196);
   cursor: pointer;
 }
 
-.output {
+.slot {
   margin-left: 4px;
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-  color: rgb(125, 128, 130);
 }
 
 .multiplierActive {
-  border: 1px solid rgb(135, 157, 224);
+  margin: 0;
+  border: 2px solid rgb(135, 157, 224);
 }
 
 .popupWrapper {
   position: absolute;
   top: 100%;
-  left: -40%;
-  width: 100%;
+  left: -80%;
+  width: 200%;
   z-index: 1;
 }
 
@@ -131,7 +133,6 @@ export default {
   margin-top: 5px;
   position: relative;
   color: rgb(125, 128, 130);
-  font-size: 12px;
 }
 
 .minValue {
